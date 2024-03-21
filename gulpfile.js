@@ -10,12 +10,7 @@ gulp.task('sass', function () {
     return gulp.src('./sass/styles.scss')
         .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
         .pipe(rename({basename: 'styles.min'}))
-        .pipe(gulp.dest('./css'));
-});
-
-// watch changes in scss files and run sass task
-gulp.task('sass:watch', function () {
-    gulp.watch('./sass/**/*.scss', ['sass']);
+        .pipe(gulp.dest('./dist/css')); // Output to dist/css directory
 });
 
 // minify js
@@ -23,8 +18,17 @@ gulp.task('minify-js', function () {
     return gulp.src('./js/scripts.js')
         .pipe(uglify())
         .pipe(rename({basename: 'scripts.min'}))
-        .pipe(gulp.dest('./js'));
+        .pipe(gulp.dest('./dist/js')); // Output to dist/js directory
 });
 
-// default task
-gulp.task('default', gulp.series('sass', 'minify-js'));
+// Build task
+gulp.task('build', gulp.series('sass', 'minify-js'));
+
+// Watch task
+gulp.task('watch', function () {
+    gulp.watch('./sass/**/*.scss', gulp.series('sass'));
+    gulp.watch('./js/*.js', gulp.series('minify-js'));
+});
+
+// Default task
+gulp.task('default', gulp.series('build', 'watch'));
